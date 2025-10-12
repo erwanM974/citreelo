@@ -1,0 +1,21 @@
+[package]
+name = "citreelo"
+version = "0.0.1"
+authors = ["Erwan Mahe"]
+edition = "2024"
+
+license = "Apache-2.0"
+description = "A simple BDD-based symbolic model checker for Computational Tree Logic"
+
+readme = "README.md"
+repository = "https://github.com/erwanM974/citreelo"
+homepage = "https://github.com/erwanM974/citreelo"
+
+keywords = ["CTL", "model-checking"]
+
+
+[dependencies]
+map-macro         = "0.3.0"
+biodivine-lib-bdd = "0.6.2"
+nom               = "8.0.0"
+
