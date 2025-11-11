@@ -16,26 +16,36 @@ limitations under the License.
 
 
 
-use nom::{branch::alt, bytes::complete::tag, combinator::value, Parser};
+use std::collections::HashSet;
 
-use crate::{parser::CtlFormulaParser, test::model::TestAtomicProp};
-
-
+use citreelo::kripke::AtomicProposition;
 
 
 
 
 
-pub struct CtlConcreteParser {}
 
-impl CtlFormulaParser<TestAtomicProp> for CtlConcreteParser {
-    fn parse_atomic_proposition<'a, E: nom::error::ParseError<&'a str>>(
-        &self,
-        input : &'a str
-    ) -> nom::IResult<&'a str, TestAtomicProp, E> {
-        alt((
-            value(TestAtomicProp::P, tag("p")),
-            value(TestAtomicProp::Q, tag("q")),
-        )).parse(input)
+
+
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+pub enum TestAtomicProp {
+    P, 
+    Q
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct TestDomainOfAp {
+    pub atoms : HashSet<TestAtomicProp>
+}
+
+impl TestDomainOfAp {
+    pub fn new(atoms: HashSet<TestAtomicProp>) -> Self {
+        Self { atoms }
+    }
+}
+
+impl AtomicProposition<TestDomainOfAp> for TestAtomicProp {
+    fn is_satisfied_on_state_domain(&self, state_domain : &TestDomainOfAp) -> bool {
+        state_domain.atoms.contains(self)
     }
 }

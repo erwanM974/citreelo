@@ -1,6 +1,6 @@
 [package]
 name = "citreelo"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Erwan Mahe"]
 edition = "2024"
 
@@ -14,8 +14,9 @@ homepage = "https://github.com/erwanM974/citreelo"
 keywords = ["CTL", "model-checking"]
 
 
-[dependencies]
-map-macro         = "0.3.0"
-biodivine-lib-bdd = "0.6.2"
-nom               = "8.0.0"
 
+[dependencies]
+map-macro            = "0.3.0"
+biodivine-lib-bdd    = "0.6.2"
+nom                  = "8.0.0"
+graphviz_dot_builder = "0.1.5"

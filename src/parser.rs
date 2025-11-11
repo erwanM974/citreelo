@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 
-use nom::{branch::alt, bytes::complete::tag, character::complete::multispace0, combinator::{map, value}, error::ParseError, IResult, Parser};
+use nom::{branch::alt, bytes::complete::tag, character::complete::multispace0, combinator::{value}, error::ParseError, IResult, Parser};
 
 use crate::ctl::*;
 
@@ -48,7 +48,7 @@ pub trait CtlFormulaParser<AP> : Sized {
     fn parse_atomic_proposition<'a, E: ParseError<&'a str>>(
         &self,
         input : &'a str
-    ) -> IResult<&'a str, AP, E>;
+    ) -> IResult<&'a str, CTLFormula<AP>, E>;
 
     fn parse_ctl_formula<'a, E: ParseError<&'a str>>(
         &self,
@@ -58,10 +58,7 @@ pub trait CtlFormulaParser<AP> : Sized {
             |x| parse_under_modal_quantifier(self, x),
             |x| parse_under_unary_logic_operator(self, x),
             |x| parse_under_binary_logic_operator(self, x),
-            map(
-            |x| self.parse_atomic_proposition(x),
-            |x| CTLFormula::Leaf(CTLFormulaLeaf::AtomicProp(x))
-            )
+            |x| self.parse_atomic_proposition(x)
         )).parse(input)  
     }
 

@@ -15,10 +15,7 @@ limitations under the License.
 */
 
 
-pub mod kripke;
-pub mod ctl;
-pub mod bdd;
-pub mod solve;
-pub mod parser;
 
-pub mod util;
+pub mod model;
+pub mod parser;
+pub mod drawer;

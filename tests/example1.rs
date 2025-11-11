@@ -16,9 +16,18 @@ limitations under the License.
 
 
 
+use graphviz_dot_builder::traits::{DotPrintable, GraphVizOutputFormat};
 use map_macro::{hash_map, hash_set};
 
-use crate::{kripke::{KripkeState, KripkeStructure}, parser::CtlFormulaParser, solve::{get_sat_set, is_ctl_formula_sat}, test::{model::{TestAtomicProp, TestDomainOfAp}, parser::CtlConcreteParser}};
+use citreelo::kripke::{KripkeState, KripkeStructure};
+use citreelo::parser::CtlFormulaParser;
+use citreelo::solve::{get_sat_set, is_ctl_formula_sat};
+use citreelo::util::viz_kripke::KripkeStructureGraphvizDrawer;
+mod common;
+
+use common::{model::{TestAtomicProp, TestDomainOfAp}, parser::CtlConcreteParser};
+
+use crate::common::drawer::TestKripkeDrawer;
 
 
 
@@ -131,3 +140,13 @@ pub fn test_ex1_with_init_states1() {
     }
 }
 
+
+
+
+
+#[test]
+pub fn test_ex1_print() {
+    let kripke = get_example_1();
+    let gv = TestKripkeDrawer{}.get_kripke_repr(&kripke);
+    gv.print_dot(&[".".to_string()], "test_ex1", &GraphVizOutputFormat::png);
+}
