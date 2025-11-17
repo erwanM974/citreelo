@@ -78,29 +78,37 @@ pub(crate) struct KripkeStructureBddRepresentation {
 
 /// tool function to build the BDD corresponding to the transition
 /// relation of a Kripke Structure 
-fn get_strict_state_formula_for_transition_relation(
-        is_next : bool, 
-        num_states : usize, 
-        var_set : &BddVariableSet, 
-        raw_vars : &[BddVariable], 
-        selected_state_id : usize
-    ) -> Bdd {
-        let mut formula = var_set.mk_true();
-        for st_id in 0..num_states {
-            let var = if is_next {
-                raw_vars.get(num_states + st_id).unwrap()
-            } else {
-                raw_vars.get(st_id).unwrap()
-            };
-            let state_bdd = if st_id == selected_state_id {
-                var_set.mk_var(*var)
-            } else {
-                var_set.mk_var(*var).not()
-            };
-            formula = formula.and(&state_bdd);
+fn get_transition_formula(
+    num_states : usize, 
+    var_set : &BddVariableSet, 
+    raw_vars : &[BddVariable], 
+    origin_st_id : usize,
+    mut target_sts_ids : Vec<usize>
+) -> Bdd {
+    let mut current_formula = var_set.mk_true();
+    let mut not_next = var_set.mk_true();
+    let mut next = var_set.mk_false();
+    for st_id in 0..num_states {
+        // ***
+        let current = if st_id == origin_st_id {
+            var_set.mk_var(*raw_vars.get(st_id).unwrap())
+        } else {
+            var_set.mk_var(*raw_vars.get(st_id).unwrap()).into_not()
+        };
+        current_formula = current_formula.and(&current);
+        // ***
+        if target_sts_ids.pop_if(|x| *x==st_id).is_some() {
+            let var = raw_vars.get(num_states + st_id).unwrap();
+            let this_next = var_set.mk_var(*var);
+            next = next.xor(&this_next);
+        } else {
+            let var = raw_vars.get(num_states + st_id).unwrap();
+            let not_this_next = var_set.mk_var(*var).into_not();
+            not_next = not_next.and(&not_this_next);
         }
-        formula
     }
+    current_formula.and(&not_next.and(&next))
+}
 
 impl KripkeStructureBddRepresentation {
 
@@ -140,24 +148,14 @@ impl KripkeStructureBddRepresentation {
         // ***
         let mut transition_relation = var_set.mk_false();
         for (origin_st_id, k_state) in kripke.states.iter().enumerate() {
-            let origin_st_current_formula = get_strict_state_formula_for_transition_relation(
-                false,
-                num_states,
-                &var_set,
-                &raw_vars,
-                origin_st_id
+            let mut targets = k_state.outgoing_transitions_targets.clone();
+            targets.sort_by(|a, b| b.cmp(a));
+            let transition_bdd = get_transition_formula(
+                num_states,&var_set,
+                &raw_vars,origin_st_id, 
+                targets
             );
-            for target_st_id in &k_state.outgoing_transitions_targets {
-                let target_st_next_formula = get_strict_state_formula_for_transition_relation(
-                    true,
-                    num_states,
-                    &var_set,
-                    &raw_vars,
-                    *target_st_id
-                );
-                let transition_bdd = origin_st_current_formula.and(&target_st_next_formula);
-                transition_relation = transition_relation.or(&transition_bdd);
-            }
+            transition_relation = transition_relation.or(&transition_bdd);
         }
         // ***
         let negated_transition_relation = transition_relation.not();
