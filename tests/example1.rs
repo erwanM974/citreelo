@@ -148,5 +148,5 @@ pub fn test_ex1_with_init_states1() {
 pub fn test_ex1_print() {
     let kripke = get_example_1();
     let gv = TestKripkeDrawer{}.get_kripke_repr(&kripke);
-    gv.print_dot(&[".".to_string()], "test_ex1", &GraphVizOutputFormat::png);
+    let _ = gv.print_dot(&[".".to_string()], "test_ex1", &GraphVizOutputFormat::png);
 }
