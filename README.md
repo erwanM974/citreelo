@@ -2,6 +2,9 @@
 
 # CITREELO
 
+[![CI](https://github.com/erwanM974/citreelo/actions/workflows/ci.yml/badge.svg)](https://github.com/erwanM974/citreelo/actions/workflows/ci.yml)
+
+
 This is a basic [ROBDD](https://en.wikipedia.org/wiki/Binary_decision_diagram)-based [symbolic model checker](https://en.wikipedia.org/wiki/Model_checking#Symbolic_model_checking) for [Computational Tree Logic](https://en.wikipedia.org/wiki/Computation_tree_logic).
 
 This work started as an interpretation of [the presentation of CTL symbolic model checking from the course of Roberto Sebastiani](http://disi.unitn.it/rseba/DIDATTICA/fm2024/SLIDES/06-SymbolicMc_handouts.pdf).
