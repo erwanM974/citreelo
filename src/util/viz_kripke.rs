@@ -14,41 +14,51 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-use graphviz_dot_builder::{edge::edge::GraphVizEdge, graph::graph::GraphVizDiGraph, item::node::{node::GraphVizNode, style::{GraphvizNodeStyleItem, GvNodeShape}}, traits::DotBuildable};
+use graphviz_dot_builder::{
+    edge::edge::GraphVizEdge,
+    graph::graph::GraphVizDiGraph,
+    item::node::{
+        node::GraphVizNode,
+        style::{GraphvizNodeStyleItem, GvNodeShape},
+    },
+    traits::DotBuildable,
+};
 
 use crate::kripke::KripkeStructure;
 
-
-
+/// Renders a [KripkeStructure] as a Graphviz digraph : one circle node
+/// per state, labelled with its id and the user-provided label of its
+/// domain value, and one edge per transition.
+///
+/// Implementors only provide [Self::get_doap_label].
 pub trait KripkeStructureGraphvizDrawer<DOAP> {
+    /// The label displayed on states labelled with the domain value `doap`.
+    fn get_doap_label(&self, doap: &DOAP) -> String;
 
-    fn get_doap_label(&self,doap : &DOAP) -> String;
-
-    fn get_kripke_repr(&self,kripke : &KripkeStructure<DOAP>) -> GraphVizDiGraph {
-
+    /// Builds the Graphviz digraph representation of `kripke`.
+    fn get_kripke_repr(&self, kripke: &KripkeStructure<DOAP>) -> GraphVizDiGraph {
         let mut digraph = GraphVizDiGraph::new(vec![]);
-        
-        for (st_id,state) in kripke.states.iter().enumerate() {
+
+        for (st_id, state) in kripke.states().iter().enumerate() {
             let label = self.get_doap_label(&state.value_in_domain);
             let style = vec![
                 GraphvizNodeStyleItem::Shape(GvNodeShape::Circle),
-                GraphvizNodeStyleItem::Label(format!("s{}\n{}",st_id,label))];
-            digraph.add_node(GraphVizNode::new(format!("st{:}",st_id),style));
+                GraphvizNodeStyleItem::Label(format!("s{}\n{}", st_id, label)),
+            ];
+            digraph.add_node(GraphVizNode::new(format!("st{}", st_id), style));
         }
-        for (orig_st_id,orig_st) in kripke.states.iter().enumerate() {
+        for (orig_st_id, orig_st) in kripke.states().iter().enumerate() {
             for targ_st_id in orig_st.outgoing_transitions_targets.iter() {
                 let edge = GraphVizEdge::new(
-                    format!("st{:}",orig_st_id),
+                    format!("st{}", orig_st_id),
                     None,
-                    format!("st{:}",targ_st_id),
+                    format!("st{}", targ_st_id),
                     None,
-                    Vec::new()
+                    Vec::new(),
                 );
                 digraph.add_edge(edge);
             }
         }
         digraph
-        
     }
 }

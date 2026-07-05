@@ -18,15 +18,10 @@ use citreelo::util::viz_kripke::KripkeStructureGraphvizDrawer;
 
 use crate::common::model::{TestAtomicProp, TestDomainOfAp};
 
-
-
-
-
-
 pub struct TestKripkeDrawer {}
 
 impl KripkeStructureGraphvizDrawer<TestDomainOfAp> for TestKripkeDrawer {
-    fn get_doap_label(&self,doap : &TestDomainOfAp) -> String {
+    fn get_doap_label(&self, doap: &TestDomainOfAp) -> String {
         let mut strs = Vec::new();
         if doap.atoms.contains(&TestAtomicProp::P) {
             strs.push("P".to_string())
@@ -34,11 +29,6 @@ impl KripkeStructureGraphvizDrawer<TestDomainOfAp> for TestKripkeDrawer {
         if doap.atoms.contains(&TestAtomicProp::Q) {
             strs.push("Q".to_string())
         };
-        format!(
-            "{{{}}}",strs.join(",")
-        )
+        format!("{{{}}}", strs.join(","))
     }
 }
-
-
-

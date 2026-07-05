@@ -14,28 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
 use std::collections::HashSet;
 
-use citreelo::kripke::AtomicProposition;
+use citreelo::kripke::{AtomicProposition, KripkeState};
 
-
-
-
-
-
-
-
+/// The atomic propositions used throughout the test suite.
+/// Three of them, because two are not enough to build interesting
+/// nested until / release formulae.
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub enum TestAtomicProp {
-    P, 
-    Q
+    P,
+    Q,
+    R,
 }
 
+/// The domain over which atomic propositions are evaluated:
+/// simply the set of propositions that hold on a state.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct TestDomainOfAp {
-    pub atoms : HashSet<TestAtomicProp>
+    pub atoms: HashSet<TestAtomicProp>,
 }
 
 impl TestDomainOfAp {
@@ -45,7 +42,17 @@ impl TestDomainOfAp {
 }
 
 impl AtomicProposition<TestDomainOfAp> for TestAtomicProp {
-    fn is_satisfied_on_state_domain(&self, state_domain : &TestDomainOfAp) -> bool {
+    fn is_satisfied_on_state_domain(&self, state_domain: &TestDomainOfAp) -> bool {
         state_domain.atoms.contains(self)
     }
+}
+
+/// Shorthand to build a state labelling from a slice of propositions.
+pub fn doap(atoms: &[TestAtomicProp]) -> TestDomainOfAp {
+    TestDomainOfAp::new(atoms.iter().cloned().collect())
+}
+
+/// Shorthand to build a Kripke state from its labelling and its successors.
+pub fn st(atoms: &[TestAtomicProp], targets: &[usize]) -> KripkeState<TestDomainOfAp> {
+    KripkeState::new(doap(atoms), targets.to_vec())
 }

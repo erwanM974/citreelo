@@ -1,11 +1,14 @@
 [package]
 name = "citreelo"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Erwan Mahe"]
 edition = "2024"
 
 license = "Apache-2.0"
 description = "A simple BDD-based symbolic model checker for Computational Tree Logic"
+
+# edition 2024 and let-chains require at least this compiler
+rust-version = "1.88"
 
 readme = "README.md"
 repository = "https://github.com/erwanM974/citreelo"
@@ -16,7 +19,29 @@ keywords = ["CTL", "model-checking"]
 
 
 [dependencies]
-map-macro            = "0.3.0"
-biodivine-lib-bdd    = "0.6.2"
+biodivine-lib-bdd    = "0.6.3"
 nom                  = "8.0.0"
 graphviz_dot_builder = "0.1.5"
+
+# Optimize dependencies even in dev/test builds: 
+# the BDD library should be compiled with optimizations
+# to run tests quickly
+[profile.dev.package."*"]
+opt-level = 2
+
+
+[dev-dependencies]
+map-macro            = "0.3.0"
+criterion            = "0.8.2"
+
+[[bench]]
+name = "bench_build"
+harness = false
+
+[[bench]]
+name = "bench_solve"
+harness = false
+
+[[bench]]
+name = "bench_parser"
+harness = false

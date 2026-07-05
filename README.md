@@ -4,16 +4,35 @@
 
 This is a basic [ROBDD](https://en.wikipedia.org/wiki/Binary_decision_diagram)-based [symbolic model checker](https://en.wikipedia.org/wiki/Model_checking#Symbolic_model_checking) for [Computational Tree Logic](https://en.wikipedia.org/wiki/Computation_tree_logic).
 
-This work is mainly an interpretation of [the presentation of CTL symbolic model checking from the course of Roberto Sebastiani](http://disi.unitn.it/rseba/DIDATTICA/fm2024/SLIDES/06-SymbolicMc_handouts.pdf).
+This work started as an interpretation of [the presentation of CTL symbolic model checking from the course of Roberto Sebastiani](http://disi.unitn.it/rseba/DIDATTICA/fm2024/SLIDES/06-SymbolicMc_handouts.pdf).
 
-I wrote this out of curiosity and it has not been extensively tested (besides the tests in "/tests/").
-
-I use [biodivine-lib-bdd](https://github.com/sybila/biodivine-lib-bdd) as as a backend for the [ROBDDs](https://en.wikipedia.org/wiki/Binary_decision_diagram).
+I use [biodivine-lib-bdd](https://github.com/sybila/biodivine-lib-bdd) as a backend for the [ROBDDs](https://en.wikipedia.org/wiki/Binary_decision_diagram).
 
 The supported [CTL](https://en.wikipedia.org/wiki/Computation_tree_logic) operators are:
 - &, |, !, =>, <=>, AX, EX, AF, EF, AG, EG, AU, EU
 
 To compute BDDs representing sets of states satisfying CTL formulae, all these operators directly correspond to operations on BDDs i.e., we do not use translation using a minimal set of operators e.g. "AX p -> !EX(!p)".
+
+## Concrete syntax
+
+Formulae are written with the usual operator precedences, so that e.g. `AG (p => EF q)` needs no further parenthesizing.
+From weakest to strongest binding:
+
+| level          | operators                                             | associativity |
+|----------------|-------------------------------------------------------|---------------|
+| 1 (weakest)    | `<=>`                                                 | left          |
+| 2              | `=>`                                                  | right         |
+| 3              | `\|`                                                  | left          |
+| 4              | `&`                                                   | left          |
+| 5              | `!`, `AX`, `EX`, `AF`, `EF`, `AG`, `EG`               | prefix        |
+| 6 (strongest)  | atoms, `true`, `false`, `(φ)`, `A[φ U ψ]`, `E[φ U ψ]` |               |
+
+The prefix operators chain (`AG EF p`, `!AX !p`) and bind tighter than the binary connectives: `AX p & q` reads as `(AX p) & q`.
+The until operators use the bracket notation `A[φ U ψ]` / `E[φ U ψ]`, where φ and ψ are full formulae.
+
+The names of the atomic propositions are defined by the user (by implementing the `CtlFormulaParser` trait); keywords are matched up to a word boundary, so an atom whose name merely starts with a keyword (e.g. `AXE`) is not shadowed.
+
+Use `parse_complete_ctl_formula` to parse a formula: it consumes the whole input and reports syntax errors with their position, rather than silently accepting a prefix of the formula.
 
 
 ## Example
@@ -27,7 +46,7 @@ We have three states:
 - s1 on which only Q holds
 - s2 on which both P and Q hold
 
-Given a CTL formula built over AP, on can determine the subset of {s0,s1,s2} on which the formula holds.
+Given a CTL formula built over AP, one can determine the subset of {s0,s1,s2} on which the formula holds.
 
 For instance we have:
 ``` 

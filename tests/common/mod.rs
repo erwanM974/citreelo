@@ -14,8 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Each integration-test binary compiles this module independently and
+// none of them uses every helper, so dead-code warnings are noise here.
+#![allow(dead_code)]
 
-
-pub mod model;
-pub mod parser;
+pub mod asserts;
 pub mod drawer;
+pub mod generators;
+pub mod model;
+pub mod oracle;
+pub mod parser;
+pub mod zoo;
